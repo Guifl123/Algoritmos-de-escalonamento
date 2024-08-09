@@ -1,0 +1,58 @@
+function simularGerenciamentoProcessos() {
+  const numProcessos = parseInt(prompt("Quantos processos você deseja simular?"));
+  const processos = [];
+  const quantum = 4; // Quantum para Round Robin (RR)
+
+  // Coletar informações dos processos
+  for (let i = 0; i < numProcessos; i++) {
+    const tempo = parseInt(prompt(`Tempo de execução do processo ${i + 1}:`));
+    processos.push({ id: i + 1, tempo, tempoRestante: tempo });
+  }
+
+  const algoritmo = prompt("Escolha o algoritmo (FIFO, SJF, RR):").toUpperCase();
+
+  let tempoTotal = 0;
+  const temposTurnaround = [];
+
+  // Simulação dos algoritmos
+  switch (algoritmo) {
+    case "FIFO":
+      for (const processo of processos) {
+        tempoTotal += processo.tempo;
+        temposTurnaround.push(tempoTotal);
+      }
+      break;
+    case "SJF":
+      processos.sort((a, b) => a.tempo - b.tempo); // Ordenar por tempo de execução
+      for (const processo of processos) {
+        tempoTotal += processo.tempo;
+        temposTurnaround.push(tempoTotal);
+      }
+      break;
+    case "RR":
+      let fila = [...processos];
+      while (fila.length > 0) {
+        const processoAtual = fila.shift();
+        if (processoAtual.tempoRestante <= quantum) {
+          tempoTotal += processoAtual.tempoRestante;
+          temposTurnaround.push(tempoTotal);
+          processoAtual.tempoRestante = 0;
+        } else {
+          tempoTotal += quantum;
+          processoAtual.tempoRestante -= quantum;
+          fila.push(processoAtual);
+        }
+      }
+      break;
+    default:
+      alert("Algoritmo inválido!");
+      return;
+  }
+
+  // Exibir resultados
+  for (let i = 0; i < numProcessos; i++) {
+    alert(`Tempo de turnaround do processo ${i + 1}: ${temposTurnaround[i]}`);
+  }
+}
+
+simularGerenciamentoProcessos();
